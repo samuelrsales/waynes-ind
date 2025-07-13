@@ -1,16 +1,11 @@
-// script.js
-
-// — Usuários “hard-coded”
 const usuarios = [
-  { usuario: 'admin', senha: 'admin', papel: 'admin' },
-  { usuario: 'func', senha: 'func', papel: 'func' }
+  { usuario: 'batman', senha: 'batman123', papel: 'admin' },
+  { usuario: 'alfred', senha: 'alfred123', papel: 'func' }
 ];
 
-// Recupera sessão e dados anteriores
 let usuarioAtual = JSON.parse(sessionStorage.getItem('usuarioAtual'))
 let recursos = JSON.parse(localStorage.getItem('recursos')) || []
 
-// Elementos do DOM
 const navegacao = document.getElementById('navegacao')
 const visaoLogin = document.getElementById('visaoLogin')
 const visaoPainel = document.getElementById('visaoPainel')
@@ -30,18 +25,13 @@ const campoNomeRecurso = document.getElementById('campoNomeRecurso')
 const campoTipoRecurso = document.getElementById('campoTipoRecurso')
 const campoQuantidadeRecurso = document.getElementById('campoQuantidadeRecurso')
 const campoValorRecurso = document.getElementById('campoValorRecurso')
-const ctxGrafico = document.getElementById('grafico').getContext('2d')
 
-let grafico;
-
-// Mostra a visão solicitada
 function mostrarVisao(visao) {
   visaoLogin.style.display = visao === 'login' ? 'block' : 'none'
   visaoPainel.style.display = visao === 'painel' ? 'block' : 'none'
   visaoRecursos.style.display = visao === 'recursos' ? 'block' : 'none'
 }
 
-// Processa login
 function entrar(evento) {
   evento.preventDefault()
   const usu = document.getElementById('campoUsuario').value
@@ -56,7 +46,6 @@ function entrar(evento) {
   inicializarApp()
 }
 
-// Processa logout
 function sair() {
   sessionStorage.removeItem('usuarioAtual')
   usuarioAtual = null
@@ -64,7 +53,6 @@ function sair() {
   mostrarVisao('login')
 }
 
-// Inicializa a aplicação
 function inicializarApp() {
   if (usuarioAtual) {
     navegacao.style.display = 'block'
@@ -79,46 +67,30 @@ function inicializarApp() {
   }
 }
 
-// Exibe o painel com total, quantidade, investimento e gráfico
 function exibirPainel() {
   totalRecursosSpan.textContent = recursos.length
 
-  // Quantidade total de unidades
   const totalQuantidade = recursos.reduce((soma, r) => soma + r.quantidade, 0);
   totalQuantidadeSpan.textContent = totalQuantidade
 
-  // Valor total investido (quantidade * valor unitário)
   const totalInvestimento = recursos
     .reduce((soma, r) => soma + (r.quantidade * (r.valor ?? 0)), 0);
   totalInvestimentoSpan.textContent = totalInvestimento
     .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-  // Média de investimento por recurso
   const mediaInvestimento = recursos.length
     ? totalInvestimento / recursos.length
     : 0;
   mediaInvestimentoSpan.textContent = mediaInvestimento
     .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-  // Gráfico de pizza por tipo (soma de quantidades)
   const contagem = {};
   recursos.forEach(r => {
     contagem[r.tipo] = (contagem[r.tipo] || 0) + r.quantidade
   });
   const labels = Object.keys(contagem)
-  const dados = Object.values(contagem)
+  const dados = Object.values(contagem)}
 
-  // if (grafico) grafico.destroy();
-  // grafico = new Chart(ctxGrafico, {
-  //   type: 'pie',
-  //   data: {
-  //     labels,
-  //     datasets: [{ data: dados, backgroundColor:['#150072ff','#36a2eb','#815e00ff'] }]
-  //   }
-  // });
-}
-
-  // Renderiza tabela de recursos (admin)
   function exibirRecursos() {
     tabelaRecursos.innerHTML = ''
     recursos.forEach(r => {
@@ -139,7 +111,6 @@ function exibirPainel() {
     document.querySelectorAll('.btnExcluir').forEach(btn => btn.onclick = excluirRecurso)
   }
 
-  // Salva um recurso editado
   function salvarRecurso(evento) {
     const id = +evento.target.dataset.id;
     const cols = evento.target.closest('tr').children
@@ -157,7 +128,6 @@ function exibirPainel() {
     alert('Recurso salvo!')
   }
 
-  // Exclui um recurso
   function excluirRecurso(evento) {
     if (!confirm('Deseja realmente excluir este recurso?')) return
     const id = +evento.target.dataset.id
@@ -167,7 +137,6 @@ function exibirPainel() {
     exibirPainel()
   }
 
-  // Adiciona novo recurso
   function adicionarRecurso(evento) {
     evento.preventDefault()
     const novo = {
@@ -184,7 +153,6 @@ function exibirPainel() {
     exibirPainel()
   }
 
-  // Abre e fecha o modal de adicionar recurso
 const btnAbrir  = document.getElementById('btnAbrirModal');
 const modal     = document.getElementById('modalAdicionar');
 const btnFechar = modal.querySelector('.fechar');
@@ -197,21 +165,16 @@ btnFechar.addEventListener('click', () => {
   modal.style.display = 'none';
 });
 
-// Fecha se clicar fora do conteúdo
 window.addEventListener('click', (e) => {
   if (e.target === modal) {
     modal.style.display = 'none';
   }
 });
 
-
-
-  // Liga eventos
   formularioLogin.addEventListener('submit', entrar)
   btnSair.onclick = sair;
   btnPainel.onclick = () => mostrarVisao('painel')
   btnRecursos.onclick = () => mostrarVisao('recursos')
   formularioAdicionar.addEventListener('submit', adicionarRecurso)
 
-  // Inicia app
   inicializarApp()
